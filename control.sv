@@ -40,8 +40,8 @@ module control(
 			`CTRL_OPCODE_ORI: all_ctrl =       {1'b0, 1'b1, 3'b111, 1'b0, 1'b0, 1'b0, 2'b01, 2'b00, 2'b00, 1'b0, 1'b0};
 			`CTRL_OPCODE_LW: all_ctrl =        {1'b0, 1'b1, 3'b000, 1'b1, 1'b0, 1'b1, 2'b01, 2'b00, 2'b00, 1'b0, 1'b0};
 			`CTRL_OPCODE_SW: all_ctrl =        {1'b0, 1'b0, 3'b000, 1'b0, 1'b1, 1'b0, 2'b01, 2'b00, 2'b00, 1'b0, 1'b0};
-			`CTRL_OPCODE_BEQ: all_ctrl =       {1'b0, 1'b0, 3'b0  , 1'b0, 1'b0, 1'b0, 2'b00, 2'b01, 2'b00, 1'b0, 1'b0};
-			`CTRL_OPCODE_BNE: all_ctrl =       {1'b0, 1'b0, 3'b0  , 1'b0, 1'b0, 1'b0, 2'b00, 2'b10, 2'b00, 1'b0, 1'b0};
+			`CTRL_OPCODE_BEQ: all_ctrl =       {1'b0, 1'b0, 3'b000, 1'b0, 1'b0, 1'b0, 2'b00, 2'b01, 2'b00, 1'b0, 1'b0};
+			`CTRL_OPCODE_BNE: all_ctrl =       {1'b0, 1'b0, 3'b000, 1'b0, 1'b0, 1'b0, 2'b00, 2'b10, 2'b00, 1'b0, 1'b0};
 			`CTRL_OPCODE_SLTI: all_ctrl =      {1'b0, 1'b1, 3'b100, 1'b0, 1'b0, 1'b0, 2'b01, 2'b00, 2'b00, 1'b0, 1'b0};
 			`CTRL_OPCODE_J: all_ctrl =         {1'b0, 1'b0, 3'b0  , 1'b0, 1'b0, 1'b0, 2'b0 , 2'b00, 2'b11, 1'b0, 1'b0};
 			`CTRL_OPCODE_JAL: all_ctrl =       {1'b0, 1'b1, 3'b00 , 1'b0, 1'b0, 1'b0, 2'b00, 2'b00, 2'b10, 1'b1, 1'b0};

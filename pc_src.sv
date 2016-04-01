@@ -30,8 +30,8 @@ module pc_src(
 			default: begin 
 				case (op)
 					3'b000: out = in_pc + 1; // normal
-					3'b011: out = in_pc + 1 + in_branch;// beq
-					3'b100: out = in_pc + 1 + in_branch;// bne
+					3'b011: out = in_pc + in_branch + 1;// beq
+					3'b100: out = in_pc + in_branch + 1;// bne
 					default : out = in_pc + 1;
 				endcase
 			end

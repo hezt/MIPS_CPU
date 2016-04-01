@@ -23,7 +23,7 @@ module instruction_mem(
 	reg [31 : 0] data [256 : 0];
 	
 	initial begin 
-		$readmemh("leddddd", data, 0, 256);
+		$readmemh("benchmark.txt", data, 0, 256);
 	end
 	
 //	always_ff @(pc) beging

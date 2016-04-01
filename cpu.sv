@@ -33,7 +33,7 @@ module cpu(
     output wire [25 : 0 ] j_address
 
 );
-	reg rst = 1'b0;
+	reg rst = 1'b1;
  	reg ONEBIT_true = 1'b1, ONEBIT_false = 1'b0;
     assign display_pc = pc_out[14 : 0];
 	assign rs_syscall = SyscallSrc == 1'b1 ? 5'd2 : rs;
@@ -49,6 +49,9 @@ module cpu(
 		else display_syscall = display_syscall;
 	end
   	
+  	always_ff @(posedge clk) begin 
+  		rst <= 1'b0;
+  	end	
 	pc PC_MOD(
 		.clk (clk),
 		.rst (rst),
