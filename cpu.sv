@@ -17,10 +17,10 @@
 
 module cpu(
 	input wire clk,
-	 (* MARKDEBUG = "TRUE" *) output reg [31 : 0] display_syscall,
+	output reg [31 : 0] display_syscall,
 	output wire [14 : 0] display_pc
 );
-	reg rst = 1'b1;
+	 reg rst = 1'b1;
  	 wire RegDst, RegWrite, MemRead, MemWrite, MemtoReg, JalSrc, SyscallSrc, halt;
 	 wire Equal, regfile_write_en; 
 	 wire [1 : 0] Branch, Jump, AluSrc;

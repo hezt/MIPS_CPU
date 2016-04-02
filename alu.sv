@@ -79,7 +79,7 @@ module alu(
         		out = ($signed(in1) < $signed(in2)) ? 1 : 0;
         	end
         	`ALU_CMPU: begin
-        		out = (in1 < in2) ? 1 : 0;
+        		out = ($unsigned(in1) < $unsigned(in2)) ? 1 : 0;
         	end
             default: begin
             	out = 32'bz;

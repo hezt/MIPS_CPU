@@ -12,18 +12,18 @@ module clock(
 	integer i = 0;
 	always_ff @(posedge clk_board) begin
 		i <= i + 1'd1;
-		if(i == 32'd5000000 - 32'd1) begin
+		if(i == 32'd4999999) begin
 			i <= 1'd0;
-			clk_cpu = ~clk_cpu;
+			clk_cpu <= ~clk_cpu;
 		end
 	end
 
 	integer j = 0;
 	always_ff @(posedge clk_board) begin
 		j <= j + 1'd1;
-		if(j >= 32'd50000 - 32'd1) begin
+		if(j >= 32'd49999) begin
 			j <= 1'd0;
-			clk_led = ~clk_led;
+			clk_led <= ~clk_led;
 		end
 	end
 	// parameter CLK_DIV_N = 5000000;

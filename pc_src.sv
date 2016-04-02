@@ -17,12 +17,8 @@ module pc_src(
 	wire [31 : 0] j, jr, jal;
 	reg [31 : 0] temp_pc;
 	assign op = {Branch, Equal};
-	// assign j = {in_pc[31 : 26], in_j};
-	assign j = {temp_pc[31 : 26], in_j};
+	assign j = {in_pc[31 : 26], in_j};
 	assign jr = in_jr;
-	always_comb begin
-		temp_pc = in_pc + 1;	
-	end
 	always_comb begin
 		case(Jump)
 			2'b11: out = j; // j
