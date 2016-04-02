@@ -21,7 +21,6 @@ module cpu(
 	output wire [14 : 0] display_pc
 );
 	reg rst = 1'b1;
- 	reg ONEBIT_true = 1'b1, ONEBIT_false = 1'b0;
  	wire RegDst, RegWrite, MemRead, MemWrite, MemtoReg, JalSrc, SyscallSrc, halt;
 	wire Equal, regfile_write_en; 
 	wire [1 : 0] Branch, Jump, AluSrc;
@@ -71,7 +70,6 @@ module cpu(
 	// sign_ext SIGN_EXT_MOD(immediate, ONEBIT_true, ext_immidiate);
 	sign_ext SIGN_EXT_MOD(
 		.in  (immediate),
-		.sign(ONEBIT_true),
 		.out (ext_immidiate)
 		);
 
