@@ -3,12 +3,12 @@
 
 `include "definitions.vh"
 `timescale 1ns / 1ps
-`define LENGTH 7
+
 
 module instruction_mem(
 
 
-	input wire [`WORD_SIZE - 1 : 0] pc,
+	input wire [31 : 0] pc,
 	output wire [5 : 0] opcode,
 	output wire [4 : 0] rs,
 	output wire [4 : 0] rt,
@@ -19,17 +19,16 @@ module instruction_mem(
 	output wire [25 : 0 ] address,
 	output wire [31 : 0] read
     );
-	wire [`LENGTH : 0] num;
-	reg [31 : 0] data [256 : 0];
-	
+	wire [8 : 0] num;
+	reg [31 : 0] data [511 : 0];
 	initial begin 
-		$readmemh("benchmark.txt", data, 0, 256);
+		$readmemh("hztbm.txt", data);
 	end
 	
 //	always_ff @(pc) beging
 //	   $display
 //	end
-	assign num = pc[`LENGTH : 0];
+	assign num = pc[8 : 0];
 	assign read = data[num];
 	assign opcode = read[31 : 26];
 	assign rs = read[25 : 21];

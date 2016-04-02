@@ -11,7 +11,7 @@ module ram(
     );
 	reg [31 : 0] data [255 : 0];
     wire [31 : 0] addr; 
-    assign addr = addr_in[31 : 0];
+    assign addr = {2'b00, addr_in[31 : 2]};
 	assign out = MemRead ? data[addr] : 32'bz;
 
 	always_ff @(negedge clk iff MemWrite) begin

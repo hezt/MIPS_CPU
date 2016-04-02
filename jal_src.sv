@@ -7,10 +7,10 @@ module jal_src(
 	input wire [1 : 0] Jump,
 	input wire RegDst, 
 	input wire MemtoReg,
-	input wire [`WORD_SIZE - 1 : 0] pc_in, alu_in, mem_in,
+	input wire [31 : 0] pc_in, alu_in, mem_in,
 	input wire [4 : 0] rt_num, rd_num,
 	output reg [4 : 0] write_num,
-	output reg [`WORD_SIZE - 1 : 0] write_data
+	output reg [31 : 0] write_data
     );
 	
 	wire [3 : 0] op = {Jump, RegDst, MemtoReg};

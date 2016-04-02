@@ -21,8 +21,8 @@ module alu_control(
 					`FUNCT_SRA: out = `ALU_SRA;
 					`FUNCT_SRL: out = `ALU_SRL;
 					`FUNCT_NOR: out = `ALU_NOR;
-					`FUNCT_SLT: out = `ALU_SRL;
-					`FUNCT_SLTU: out = `FUNCT_SLTU;
+					`FUNCT_SLT: out = `ALU_CMP;
+					`FUNCT_SLTU: out = `ALU_CMPU;
 					default : out = 4'dz;
 				endcase
 			end

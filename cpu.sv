@@ -18,40 +18,36 @@
 module cpu(
 	input wire clk,
 	output reg [31 : 0] display_syscall,
-	output wire [14 : 0] display_pc,
-	output wire RegDst, RegWrite, MemRead, MemWrite, MemtoReg, JalSrc, SyscallSrc, halt,
-	output wire Equal, regfile_write_en, of, cf,
-	output wire [1 : 0] Branch, Jump, AluSrc,
-	output wire [5 : 0] opcode, funct,
-	output wire [2 : 0] AluOp,
-	output wire [4 : 0] rs, rt, rd, shamt, regfile_write_num, rs_syscall, rt_syscall,
-	output wire [31 : 0] pc_out, read,
-	output wire [3 : 0] alu_control_op_out,
-	output wire [31 : 0] pc_src_out, ext_immidiate, alu_out, mem_out, regfile_write_data,
-    output wire [31 : 0] regfile_read_data1, regfile_read_data2, alu_src_out1, alu_src_out2,
-    output wire [15 : 0 ] immediate,
-    output wire [25 : 0 ] j_address
-
+	output wire [14 : 0] display_pc
 );
 	reg rst = 1'b1;
  	reg ONEBIT_true = 1'b1, ONEBIT_false = 1'b0;
+ 	wire RegDst, RegWrite, MemRead, MemWrite, MemtoReg, JalSrc, SyscallSrc, halt;
+	wire Equal, regfile_write_en; 
+	wire [1 : 0] Branch, Jump, AluSrc;
+	wire [5 : 0] opcode, funct;
+	wire [2 : 0] AluOp;
+	wire [4 : 0] rs, rt, rd, shamt, regfile_write_num, rs_syscall, rt_syscall;
+	wire [31 : 0] pc_out, read;
+	wire [3 : 0] alu_control_op_out;
+	wire [31 : 0] pc_src_out, ext_immidiate, alu_out, mem_out, regfile_write_data;
+    wire [31 : 0] regfile_read_data1, regfile_read_data2, alu_src_out1, alu_src_out2;
+    wire [15 : 0 ] immediate;
+    wire [25 : 0 ] j_address;
     assign display_pc = pc_out[14 : 0];
 	assign rs_syscall = SyscallSrc == 1'b1 ? 5'd2 : rs;
 	assign rt_syscall = SyscallSrc == 1'b1 ? 5'd4 : rt; 
 	assign halt = SyscallSrc == 1'b1 ? (regfile_read_data1 == 32'd10 ? 1'b1 : 1'b0) : 1'b0;
-	always_comb begin
-		// rst <= 1'b0;
-		if(SyscallSrc == 1'b1) begin
-			if(regfile_read_data1 == 32'd10)
-				display_syscall = display_syscall;
-			else display_syscall = regfile_read_data2;
-		end
-		else display_syscall = display_syscall;
-	end
-  	
+
   	always_ff @(posedge clk) begin 
-  		rst <= 1'b0;
-  	end	
+		rst <= 1'b0;
+		if(SyscallSrc == 1'b1) begin
+			if(regfile_read_data1 == 32'd10) display_syscall <= display_syscall;
+			else display_syscall <= regfile_read_data2;
+		end
+		else display_syscall <= display_syscall;	
+  	end
+  	
 	pc PC_MOD(
 		.clk (clk),
 		.rst (rst),
@@ -126,8 +122,6 @@ module cpu(
 		.in1  (alu_src_out1),
 	 	.in2  (alu_src_out2),
 	 	.out  (alu_out),
-	 	.of   (of),
-	 	.cf   (cf),
 	 	.equal(Equal)
 	 	);
 	// alu_control ALU_CONTROL_MOD(AluOp, funct, alu_control_op_out);
