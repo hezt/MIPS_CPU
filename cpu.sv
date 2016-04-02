@@ -17,22 +17,22 @@
 
 module cpu(
 	input wire clk,
-	output reg [31 : 0] display_syscall,
+	 (* MARKDEBUG = "TRUE" *) output reg [31 : 0] display_syscall,
 	output wire [14 : 0] display_pc
 );
 	reg rst = 1'b1;
- 	wire RegDst, RegWrite, MemRead, MemWrite, MemtoReg, JalSrc, SyscallSrc, halt;
-	wire Equal, regfile_write_en; 
-	wire [1 : 0] Branch, Jump, AluSrc;
-	wire [5 : 0] opcode, funct;
-	wire [2 : 0] AluOp;
-	wire [4 : 0] rs, rt, rd, shamt, regfile_write_num, rs_syscall, rt_syscall;
-	wire [31 : 0] pc_out, read;
-	wire [3 : 0] alu_control_op_out;
-	wire [31 : 0] pc_src_out, ext_immidiate, alu_out, mem_out, regfile_write_data;
-    wire [31 : 0] regfile_read_data1, regfile_read_data2, alu_src_out1, alu_src_out2;
-    wire [15 : 0 ] immediate;
-    wire [25 : 0 ] j_address;
+ 	 wire RegDst, RegWrite, MemRead, MemWrite, MemtoReg, JalSrc, SyscallSrc, halt;
+	 wire Equal, regfile_write_en; 
+	 wire [1 : 0] Branch, Jump, AluSrc;
+	 wire [5 : 0] opcode, funct;
+	 wire [2 : 0] AluOp;
+	 wire [4 : 0] rs, rt, rd, shamt, regfile_write_num, rs_syscall, rt_syscall;
+	 wire [31 : 0] pc_out, read;
+	 wire [3 : 0] alu_control_op_out;
+	 wire [31 : 0] pc_src_out, ext_immidiate, alu_out, mem_out, regfile_write_data;
+     wire [31 : 0] regfile_read_data1, regfile_read_data2, alu_src_out1, alu_src_out2;
+     wire [15 : 0 ] immediate;
+     wire [25 : 0 ] j_address;
     assign display_pc = pc_out[14 : 0];
 	assign rs_syscall = SyscallSrc == 1'b1 ? 5'd2 : rs;
 	assign rt_syscall = SyscallSrc == 1'b1 ? 5'd4 : rt; 
