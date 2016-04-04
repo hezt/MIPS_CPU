@@ -6,7 +6,7 @@
 
 module pc(
 	input wire clk,
-	input wire rst, halt,
+	input wire rst, halt, pc_bj,
 	input wire [`WORD_SIZE - 1 : 0] in,
 	output reg [`WORD_SIZE - 1 : 0] out = 32'h0
     );
@@ -21,10 +21,14 @@ module pc(
 			out <= 32'h0; 
 		end
 		else if (halt == 1'b1) begin
+			// halt is 1
 			out <= out;
 		end 
-		else begin
+		else if(pc_bj == 1'b1) begin
 			out <= in;
+		end
+		else begin
+			out <= out + 1'b1;
 		end
 	end
 endmodule

@@ -14,6 +14,9 @@
 `include "regfile.sv"
 `include "sign_ext.sv"
 `include "alu_src.sv"
+`include "if_id.sv"
+`include "instruction_decoder.sv"
+`include "id_ex.sv"
 
 module cpu(
 	input wire clk,
@@ -21,145 +24,242 @@ module cpu(
 	output wire [14 : 0] display_pc
 );
 	reg rst = 1'b1;
- 	wire RegDst, RegWrite, MemRead, MemWrite, MemtoReg, JalSrc, SyscallSrc, halt;
-	wire Equal, regfile_write_en; 
-	wire [1 : 0] Branch, Jump, AluSrc;
-	wire [5 : 0] opcode, funct;
-	wire [2 : 0] AluOp;
-	wire [4 : 0] rs, rt, rd, shamt, regfile_write_num, rs_syscall, rt_syscall;
-	wire [31 : 0] pc_out, read;
-	wire [3 : 0] alu_control_op_out;
-	wire [31 : 0] pc_src_out, ext_immidiate, alu_out, mem_out, regfile_write_data;
-    wire [31 : 0] regfile_read_data1, regfile_read_data2, alu_src_out1, alu_src_out2;
-    wire [15 : 0 ] immediate;
-    wire [25 : 0 ] j_address;
-    assign display_pc = pc_out[14 : 0];
-	assign rs_syscall = SyscallSrc == 1'b1 ? 5'd2 : rs;
-	assign rt_syscall = SyscallSrc == 1'b1 ? 5'd4 : rt; 
-	assign halt = SyscallSrc == 1'b1 ? (regfile_read_data1 == 32'd10 ? 1'b1 : 1'b0) : 1'b0;
+	// pc signal
+	wire [31 : 0] pc_if, pc_if_id, pc_id_ex;
 
-  	always_ff @(posedge clk) begin 
+	// instruction and decode signal
+	wire [31 : 0] instruction_if, instruction_if_id, instruction_id_ex;
+	wire [5 : 0] opcode_id;
+	wire [5 : 0] funct_id, funct_id_ex;
+	wire [4 : 0] rs_id;
+	wire [4 : 0] rt_id;
+	wire [4 : 0] rd_id;
+	wire [4 : 0] shamt_id, shamt_id_ex;
+	wire [15 : 0] immediate_id;
+	wire [25 : 0] address_id, address_id_ex;
+
+	// control signal
+	wire [1 : 0] Branch_id, Branch_id_ex;
+	wire [1 : 0] Jump_id, Jump_id_ex;
+	wire [1 : 0] AluSrc_id, AluSrc_id_ex;
+	wire [2 : 0] AluOp_id, AluOp_id_ex;
+	wire RegDst_id, RegDst_id_ex;
+	wire RegWrite_id, RegDst_id_ex;
+	wire MemRead_id, MemRead_id_ex;
+	wire MemWrite_id, MemWrite_id_ex;
+	wire MemtoReg_id, MemtoReg_id_ex;
+	wire JalSrc_id, JalSrc_id_ex;
+	wire SyscallSrc_id, SyscallSrc_id_ex;
+
+	// sign extention
+	wire [31 : 0]ext_immediate_id, ext_immediate_id_ex;
+
+	// regfile
+	wire [4 : 0] regfile_read_num1_id, regfile_read_num1_syscall_id;
+	wire [4 : 0] regfile_read_num2_id, regfile_read_num2_syscall_id;
+	wire [4 : 0] regfile_write_num_id; // cun yi
+	wire regfile_write_en_id; // cun yi
+	wire [31 : 0] regfile_write_data_id; // cun yi
+	wire [31 : 0] regfile_read_data1_id, regfile_read_data1_id_ex; 
+	wire [31 : 0] regfile_read_data2_id, regfile_read_data2_id_ex;
+
+	// alu_src
+	wire [31 : 0] alu_src_out1_ex;
+	wire [31 : 0] alu_src_out1_ex;
+	// alu ctrl
+	wire [3 : 0] alu_control_out_ex;
+	// alu
+	wire alu_equal_ex;
+	wire [31 : 0] alu_out_ex;
+	// pc src
+	wire [31 : 0] pc_src_out_ex;
+	wire pc_src_bj_ex;
+	wire halt_ex;
+
+	// ID syscall's getting data
+	assign regfile_read_num1_syscall_id = SyscallSrc_id == 1'b1 ? 5'd2 : regfile_read_num1_id;
+	assign regfile_read_num2_syscall_id = SyscallSrc_id == 1'b1 ? 5'd4 : regfile_read_num2_id;
+	// EX syscall's execution
+	assign halt_ex = SyscallSrc_id_ex == 1'b1 ? (regfile_read_data1_id_ex == 32'd10 ? 1'b1 : 1'b0) : 1'b0;
+	always_ff @(posedge clk) begin 
 		rst <= 1'b0;
-		if(SyscallSrc == 1'b1) begin
-			if(regfile_read_data1 == 32'd10) display_syscall <= display_syscall;
-			else display_syscall <= regfile_read_data2;
+		if(SyscallSrc_id_ex == 1'b1) begin
+			if(regfile_read_data1_id_ex == 32'd10) display_syscall <= display_syscall;
+			else display_syscall <= regfile_read_data2_id_ex;
 		end
 		else display_syscall <= display_syscall;	
   	end
-  	
+  	// EX display pc
+  	assign display_pc = pc_if[14 : 0];
 
+
+
+	// IF
 	pc PC_MOD(
-		.clk (clk),
-		.rst (rst),
-		.halt(halt),
-		.in  (pc_src_out),
-		.out (pc_out)
+		.clk  (clk),
+		.rst  (rst),
+		.halt (halt_ex),
+		.in   (pc_src_out_ex),
+		.out  (pc_if),
+		.pc_bj(pc_src_bj_ex)	
 		);
-	// pc_src PC_SRC_MOD(Branch, Jump, Equal, pc_out, ext_immidiate, j_address, regfile_read_data1, pc_src_out);
-	pc_src PC_SRC_MOD(
-		.Branch   (Branch),
-		.Jump     (Jump),
-		.Equal    (Equal),
-		.in_pc    (pc_out),
-		.in_branch(ext_immidiate),
-		.in_j     (j_address),
-		.in_jr    (regfile_read_data1),
-		.out      (pc_src_out)
+	instruction_mem INSTRUCTION_MEM_MOD(
+		.pc_if         (pc_if),
+		.instruction_if(instruction_if)
 		);
-
-	// sign_ext SIGN_EXT_MOD(immediate, ONEBIT_true, ext_immidiate);
-	sign_ext SIGN_EXT_MOD(
-		.in  (immediate),
-		.out (ext_immidiate)
+	// IF/ID
+	if_id IF_ID_MOD(
+		.clk              (clk),
+		.instruction_if   (instruction_if),
+		.pc_if            (pc_if),
+		.instruction_if_id(instruction_if_id),
+		.pc_if_id         (pc_if_id)
 		);
-
-	// jal_src JAL_SRC_MOD(JalSrc, RegDst, MemtoReg, pc_out, alu_out, mem_out,  rt, rd, regfile_write_en, regfile_write_num, regfile_write_data);
-	jal_src JAL_SRC_MOD(
-		.Jump      (Jump),
-		.RegDst    (RegDst),
-		.MemtoReg  (MemtoReg),
-		.pc_in     (pc_out),
-		.alu_in    (alu_out),
-		.mem_in    (mem_out),
-		.rt_num    (rt),
-		.rd_num    (rd),
-		.write_num (regfile_write_num),
-		.write_data(regfile_write_data)
+	// ID
+	instruction_decoder INSTRUCTION_DECODER_MOD(
+		.instruction_if_id(instruction_if_id),
+		.opcode           (opcode_id),
+		.rs               (rs_id),
+		.rt               (rt_id),
+		.rd               (rd_id),
+		.shamt            (shamt_id),
+		.funct            (funct_id),
+		.immediate        (immediate_id),
+		.address          (address_id)
 		);
-	// control CONTROL_MOD(opcode, funct, RegDst, RegWrite, MemRead, MemWrite, MemtoReg, AluSrc, JalSrc, AluOp, Branch, Jump, SyscallSrc);
 	control CONTROL_MOD(
-		.opcode    (opcode),
-		.funct     (funct),
-		.RegDst    (RegDst),
-		.RegWrite  (RegWrite),
-		.MemRead   (MemRead),
-		.MemWrite  (MemWrite),
-		.MemtoReg  (MemtoReg),
-		.AluSrc    (AluSrc),
-		.JalSrc    (JalSrc),
-		.AluOp     (AluOp),
-		.Branch    (Branch),
-		.Jump      (Jump),
-		.SyscallSrc(SyscallSrc)
+		.opcode    (opcode_id),
+		.funct     (funct_id),
+		.RegDst    (RegDst_id),
+		.RegWrite  (RegWrite_id),
+		.MemRead   (MemRead_id),
+		.MemWrite  (MemWrite_id),
+		.MemtoReg  (MemtoReg_id),
+		.JalSrc    (JalSrc_id),
+		.Branch    (Branch_id),
+		.Jump      (Jump_id),
+		.AluSrc    (AluSrc_id),
+		.SyscallSrc(SyscallSrc_id),
+		.AluOp     (AluOp_id),
 		);
-	// regfile REGFILE_MOD(clk, rs_syscall, rt_syscall, regfile_write_num, regfile_write_en, regfile_write_data, regfile_read_data1, regfile_read_data2);
 	regfile REGFILE_MOD(
 		.clk       (clk),
-		.read_num1 (rs_syscall),
-		.read_num2 (rt_syscall),
-		.write_num (regfile_write_num),
-		.write_en  (RegWrite),
-		.write_data(regfile_write_data),
-		.read_data1(regfile_read_data1),
-		.read_data2(regfile_read_data2)
+		.read_num1 (regfile_read_num1_syscall_id),
+		.read_num2 (regfile_read_num2_syscall_id),
+		.write_num (regfile_write_num_id),
+		.write_en  (regfile_write_en_id),
+		.write_data(regfile_write_data_id),
+		.read_data1(regfile_read_data1_id),
+		.read_data2(regfile_read_data2_id)
+		);
+	sign_ext SIGN_EXT_MOD(
+		.in (immediate_id),
+		.out(ext_immediate_id)
 		);
 
-	// alu ALU_MOD(alu_control_op_out, regfile_read_data1, alu_src_out, alu_out, of, cf, Equal);
-	alu ALU_MOD(
-		.op   (alu_control_op_out),
-		.in1  (alu_src_out1),
-	 	.in2  (alu_src_out2),
-	 	.out  (alu_out),
-	 	.equal(Equal)
-	 	);
-	// alu_control ALU_CONTROL_MOD(AluOp, funct, alu_control_op_out);
-	alu_control ALU_CONTROL_MOD(
-		.AluOp(AluOp),
-		.funct(funct),
-	 	.out  (alu_control_op_out)
-	 	);
-	// instruction_mem INSTRUCTION_MEM_MOD(pc_out, opcode, rs, rt, rd, shamt, funct, immediate, j_address, read);
-	instruction_mem INSTRUCTION_MEM_MOD(
-		.pc       (pc_out),
-		.opcode   (opcode),
-		.rs       (rs),
-		.rt       (rt),
-		.rd       (rd),
-		.shamt    (shamt),
-		.funct    (funct),
-		.immediate(immediate),
-		.address  (j_address),
-		.read     (read)
+	// ID/EX
+	id_ex ID_EX_MOD(
+		.clk                (clk),
+		.pc_if_id           (pc_if_id),
+		.funct_id           (funct_id),
+		.shamt_id           (shamt_id),
+		.ext_immediate_id   (ext_immediate_id),
+		.address_id         (address_id),
+		.Branch_id          (Branch_id),
+		.Jump_id            (Jump_id),
+		.AluSrc_id          (AluSrc_id),
+		.AluOp_id           (AluOp_id),
+		.RegDst_id          (RegDst_id),
+		.RegWrite_id        (RegWrite_id),
+		.MemRead_id         (MemRead_id),
+		.MemWrite_id        (MemWrite_id),
+		.MemtoReg_id        (MemtoReg_id),
+		.JalSrc_id          (JalSrc_id),
+		.SyscallSrc_id      (SyscallSrc_id),
+		.read_data1_id      (regfile_read_data1_id),
+		.read_data2_id      (regfile_read_data2_id),
+		.pc_id_ex           (pc_id_ex),
+		.funct_id_ex        (funct_id_ex),
+		.shamt_id_ex        (shamt_id_ex),
+		.ext_immediate_id_ex(ext_immediate_id_ex),
+		.address_id_ex      (address_id_ex),
+		.Branch_id_ex       (Branch_id_ex),
+		.Jump_id_ex         (Jump_id_ex),
+		.AluSrc_id_ex       (AluSrc_id_ex),
+		.AluOp_id_ex        (AluOp_id_ex),
+		.RegDst_id_ex       (RegDst_id_ex),
+		.RegWrite_id_ex     (RegWrite_id_ex),
+		.MemRead_id_ex      (MemRead_id_ex),
+		.MemWrite_id_ex     (MemWrite_id_ex),
+		.MemtoReg_id_ex     (MemtoReg_id_ex),
+		.JalSrc_id_ex       (JalSrc_id_ex),
+		.SyscallSrc_id_ex   (SyscallSrc_id_ex),
+		.read_data1_id_ex   (regfile_read_data1_id_ex),
+		.read_data2_id_ex   (regfile_read_data2_id_ex),
+		.instruction_if_id  (instruction_if_id),
+		.instruction_id_ex  (instruction_id_ex)
 		);
 
+	// EX
 	alu_src ALU_SRC_MOD(
-		.AluSrc            (AluSrc),
-		.regfile_read_data1(regfile_read_data1),
-		.regfile_read_data2(regfile_read_data2),
-		.ext_immidiate     (ext_immidiate),
-		.shamt             (shamt),
-		.alu_src_out1      (alu_src_out1),
-		.alu_src_out2      (alu_src_out2)
+		.AluSrc            (AluSrc_id_ex),
+		.regfile_read_data1(regfile_read_data1_id_ex),
+		.regfile_read_data2(regfile_read_data2_id_ex),
+		.ext_immidiate     (ext_immediate_id_ex),
+		.shamt             (shamt_id_ex),
+		.alu_src_out1      (alu_src_out1_ex),
+		.alu_src_out2      (alu_src_out2_ex)
 		);
-	// ram RAM_MOD(alu_out, regfile_read_data2, MemRead, MemWrite, clk, mem_out);
-	ram RAM_MOD(
-		.addr_in   (alu_out),
-		.write_data(regfile_read_data2),
-		.MemRead   (MemRead),
-		.MemWrite  (MemWrite),
-		.clk       (clk),
-		.out       (mem_out)
+
+	alu_control ALU_CONTROL_MOD(
+		.AluOp(AluOp_id_ex),
+		.funct(funct_id_ex),
+		.out  (alu_control_out_ex)
 		);
+	alu ALU_MOD(
+		.op   (alu_control_out_ex),
+		.in1  (alu_src_out1_ex),
+		.in2  (alu_src_out2),
+		.out  (alu_out_ex),
+		.equal(alu_equal_ex)
+		);
+	pc_src PC_SRC_MOD(
+		.Branch   (Branch_id_ex),
+		.Jump     (Jump_id_ex),
+		.Equal    (alu_equal_ex),
+		.in_pc    (pc_id_ex),
+		.in_branch(ext_immediate_id_ex),
+		.in_j     (address_id_ex),
+		.in_jr    (regfile_read_data1_id_ex),
+		.out      (pc_src_out_ex),
+		.pc_bj    (pc_src_bj_ex)
+		);	
+  	
+
+
+	// // jal_src JAL_SRC_MOD(JalSrc, RegDst, MemtoReg, pc_out, alu_out, mem_out,  rt, rd, regfile_write_en, regfile_write_num, regfile_write_data);
+	// jal_src JAL_SRC_MOD(
+	// 	.Jump      (Jump),
+	// 	.RegDst    (RegDst),
+	// 	.MemtoReg  (MemtoReg),
+	// 	.pc_in     (pc_out),
+	// 	.alu_in    (alu_out),
+	// 	.mem_in    (mem_out),
+	// 	.rt_num    (rt),
+	// 	.rd_num    (rd),
+	// 	.write_num (regfile_write_num),
+	// 	.write_data(regfile_write_data)
+	// 	);
+
+	// // ram RAM_MOD(alu_out, regfile_read_data2, MemRead, MemWrite, clk, mem_out);
+	// ram RAM_MOD(
+	// 	.addr_in   (alu_out),
+	// 	.write_data(regfile_read_data2),
+	// 	.MemRead   (MemRead),
+	// 	.MemWrite  (MemWrite),
+	// 	.clk       (clk),
+	// 	.out       (mem_out)
+	// 	);
 
 endmodule
 
