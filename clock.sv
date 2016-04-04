@@ -9,20 +9,20 @@ module clock(
 	output reg clk_led = 1'b0
     );
 	
-	integer i = 0;
+	reg [31 : 0] i = 32'd0;
 	always_ff @(posedge clk_board) begin
-		i <= i + 1'd1;
+		i <= i + 32'd1;
 		if(i == 32'd4999999) begin
-			i <= 1'd0;
+			i <= 32'd0;
 			clk_cpu <= ~clk_cpu;
 		end
 	end
 
-	integer j = 0;
+	reg [31 : 0] j = 32'd0;
 	always_ff @(posedge clk_board) begin
-		j <= j + 1'd1;
+		j <= j + 32'd1;
 		if(j >= 32'd49999) begin
-			j <= 1'd0;
+			j <= 32'd0;
 			clk_led <= ~clk_led;
 		end
 	end

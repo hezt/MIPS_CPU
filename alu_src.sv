@@ -12,7 +12,7 @@ module alu_src(
 	always_comb begin
 		case (AluSrc)
 			2'b00: begin
-				// normal
+				// r
 				alu_src_out1 = regfile_read_data1;
 				alu_src_out2 = regfile_read_data2;
 			end
