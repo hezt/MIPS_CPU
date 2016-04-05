@@ -4,7 +4,7 @@
 
 module id_ex(
 	input wire clk,
-	input wire pc_if_id,
+	input wire [31 : 0] pc_if_id,
 	input wire [5 : 0] funct_id,
 	input wire [4 : 0] shamt_id,
 	input wire [31 : 0] ext_immediate_id,
@@ -23,7 +23,7 @@ module id_ex(
 	input wire [31 : 0] read_data2_id,
 	input wire [31 : 0] instruction_if_id,
 	input wire [4 : 0] rt_id, rd_id,
-	output reg pc_id_ex,
+	output reg [31 : 0]pc_id_ex,
 	output reg [5 : 0] funct_id_ex,
 	output reg [4 : 0] shamt_id_ex,
 	output reg [31 : 0] ext_immediate_id_ex,
