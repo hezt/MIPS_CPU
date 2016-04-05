@@ -57,8 +57,8 @@ module cpu(
 	wire [31 : 0]ext_immediate_id, ext_immediate_id_ex;
 
 	// regfile
-	reg [4 : 0] regfile_read_num1_syscall_id;
-	reg [4 : 0] regfile_read_num2_syscall_id;
+	reg [4 : 0] regfile_read_num1_syscall_id = 1'b0;
+	reg [4 : 0] regfile_read_num2_syscall_id = 1'b0;
 	wire [4 : 0] regfile_write_num_wb;
 	wire [31 : 0] regfile_write_data_wb;
 	wire [31 : 0] regfile_read_data1_id, regfile_read_data1_id_ex; 
@@ -87,7 +87,7 @@ module cpu(
 		if(SyscallSrc_id == 1'b1) begin
 			regfile_read_num1_syscall_id = 5'd2;
 		end
-		else begin 
+		else begin
 			regfile_read_num1_syscall_id = rs_id;
 		end
 	end
@@ -95,7 +95,7 @@ module cpu(
 		if(SyscallSrc_id == 1'b1) begin
 			regfile_read_num2_syscall_id = 5'd4;
 		end
-		else begin 
+		else begin
 			regfile_read_num2_syscall_id = rt_id;
 		end
 	end

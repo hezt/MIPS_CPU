@@ -15,16 +15,16 @@ module mem_wb(
 	input wire  RegDst_ex_mem,
 	input wire RegWrite_ex_mem,
 	input wire halt_ex_mem,
-	output reg [31 : 0] pc_mem_wb,
-	output reg [31 : 0] instruction_mem_wb,
-	output reg MemtoReg_mem_wb,
-	output reg [1 : 0] Jump_mem_wb,
-	output reg [4 : 0] rt_mem_wb, rd_mem_wb,
-	output reg [31 : 0] alu_out_mem_wb,
-	output reg [31 : 0] ram_read_data_mem_wb,
-	output reg RegDst_mem_wb,
-	output reg RegWrite_mem_wb,
-	output reg halt_mem_wb
+	output reg [31 : 0] pc_mem_wb = 0,
+	output reg [31 : 0] instruction_mem_wb = 0,
+	output reg MemtoReg_mem_wb = 0,
+	output reg [1 : 0] Jump_mem_wb = 0,
+	output reg [4 : 0] rt_mem_wb, rd_mem_wb = 0,
+	output reg [31 : 0] alu_out_mem_wb = 0,
+	output reg [31 : 0] ram_read_data_mem_wb = 0,
+	output reg RegDst_mem_wb = 0,
+	output reg RegWrite_mem_wb = 0,
+	output reg halt_mem_wb = 0
     );
 	
 	always_ff @(posedge clk) begin

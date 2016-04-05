@@ -18,18 +18,18 @@ module ex_mem(
 	input wire [4 : 0] rt_id_ex, rd_id_ex,
 	input wire [1 : 0] Jump_id_ex,
 	input wire halt_ex,
-	output reg [31 : 0] pc_ex_mem,
-	output reg [31 : 0] instruction_ex_mem,
-	output reg RegWrite_ex_mem,
-	output reg RegDst_ex_mem,
-	output reg MemRead_ex_mem,
-	output reg MemWrite_ex_mem,
-	output reg MemtoReg_ex_mem,
-	output reg [1 : 0] Jump_ex_mem,
-	output reg [31 : 0] alu_out_ex_mem,
-	output reg [31 : 0] ram_write_data_ex_mem,
-	output reg [4 : 0] rt_ex_mem, rd_ex_mem,
-	output reg halt_ex_mem
+	output reg [31 : 0] pc_ex_mem = 0,
+	output reg [31 : 0] instruction_ex_mem = 0,
+	output reg RegWrite_ex_mem = 0,
+	output reg RegDst_ex_mem = 0,
+	output reg MemRead_ex_mem = 0,
+	output reg MemWrite_ex_mem = 0,
+	output reg MemtoReg_ex_mem = 0,
+	output reg [1 : 0] Jump_ex_mem = 0,
+	output reg [31 : 0] alu_out_ex_mem = 0,
+	output reg [31 : 0] ram_write_data_ex_mem = 0,
+	output reg [4 : 0] rt_ex_mem, rd_ex_mem = 0,
+	output reg halt_ex_mem = 0
     );
 	
 	always_ff @(posedge clk) begin 

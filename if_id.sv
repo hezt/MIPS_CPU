@@ -6,7 +6,7 @@
 module if_id(
 	input wire clk,
 	input wire [31 : 0] instruction_if, pc_if,
-	output reg [31 : 0] instruction_if_id, pc_if_id
+	output reg [31 : 0] instruction_if_id = 0, pc_if_id = 0
     );
 
 	always_ff @(posedge clk) begin
