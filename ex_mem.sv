@@ -17,6 +17,7 @@ module ex_mem(
 	input wire [31 : 0] regfile_read_data2_id_ex,
 	input wire [4 : 0] rt_id_ex, rd_id_ex,
 	input wire [1 : 0] Jump_id_ex,
+	input wire halt_ex,
 	output reg [31 : 0] pc_ex_mem,
 	output reg [31 : 0] instruction_ex_mem,
 	output reg RegWrite_ex_mem,
@@ -27,10 +28,11 @@ module ex_mem(
 	output reg [1 : 0] Jump_ex_mem,
 	output reg [31 : 0] alu_out_ex_mem,
 	output reg [31 : 0] ram_write_data_ex_mem,
-	output reg [4 : 0] rt_ex_mem, rd_ex_mem
+	output reg [4 : 0] rt_ex_mem, rd_ex_mem,
+	output reg halt_ex_mem
     );
 	
-	always_ff @(negedge clk) begin 
+	always_ff @(posedge clk) begin 
 		pc_ex_mem <= pc_id_ex;
 		instruction_ex_mem <= instruction_id_ex;
 		RegDst_ex_mem <= RegDst_id_ex;
@@ -43,6 +45,7 @@ module ex_mem(
 		rd_ex_mem <= rd_id_ex;
 		Jump_ex_mem <= Jump_id_ex;
 		RegWrite_ex_mem <= RegWrite_id_ex;
+		halt_ex_mem <= halt_ex;
 	end
 
 endmodule

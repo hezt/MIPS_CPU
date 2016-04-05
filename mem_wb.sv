@@ -14,6 +14,7 @@ module mem_wb(
 	input wire [31 : 0] ram_read_data_mem,
 	input wire  RegDst_ex_mem,
 	input wire RegWrite_ex_mem,
+	input wire halt_ex_mem,
 	output reg [31 : 0] pc_mem_wb,
 	output reg [31 : 0] instruction_mem_wb,
 	output reg MemtoReg_mem_wb,
@@ -22,10 +23,11 @@ module mem_wb(
 	output reg [31 : 0] alu_out_mem_wb,
 	output reg [31 : 0] ram_read_data_mem_wb,
 	output reg RegDst_mem_wb,
-	output reg RegWrite_mem_wb
+	output reg RegWrite_mem_wb,
+	output reg halt_mem_wb
     );
 	
-	always_ff @(negedge clk) begin
+	always_ff @(posedge clk) begin
 		pc_mem_wb <= pc_ex_mem;
 		instruction_mem_wb <= instruction_ex_mem;
 		MemtoReg_mem_wb <= MemtoReg_ex_mem;
@@ -36,6 +38,7 @@ module mem_wb(
 		rd_mem_wb <= rd_ex_mem;
 		RegDst_mem_wb <= RegDst_ex_mem;
 		RegWrite_mem_wb <= RegWrite_ex_mem;
+		halt_mem_wb <= halt_ex_mem;
 	end
 endmodule
 

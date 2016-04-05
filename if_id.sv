@@ -9,7 +9,7 @@ module if_id(
 	output reg [31 : 0] instruction_if_id, pc_if_id
     );
 
-	always_ff @(negedge clk) begin
+	always_ff @(posedge clk) begin
 		instruction_if_id <= instruction_if;
 		pc_if_id <= pc_if;
 	end

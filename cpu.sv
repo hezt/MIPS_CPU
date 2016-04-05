@@ -21,7 +21,7 @@
 `include "mem_wb.sv"
 
 module cpu(
-	input wire clk_origin,
+	input wire clk,
 	output reg [31 : 0] display_syscall,
 	output wire [14 : 0] display_pc
 );
@@ -57,8 +57,8 @@ module cpu(
 	wire [31 : 0]ext_immediate_id, ext_immediate_id_ex;
 
 	// regfile
-	wire [4 : 0] regfile_read_num1_id, regfile_read_num1_syscall_id;
-	wire [4 : 0] regfile_read_num2_id, regfile_read_num2_syscall_id;
+	reg [4 : 0] regfile_read_num1_syscall_id;
+	reg [4 : 0] regfile_read_num2_syscall_id;
 	wire [4 : 0] regfile_write_num_wb;
 	wire [31 : 0] regfile_write_data_wb;
 	wire [31 : 0] regfile_read_data1_id, regfile_read_data1_id_ex; 
@@ -75,15 +75,30 @@ module cpu(
 	// pc src
 	wire [31 : 0] pc_src_out_ex;
 	wire pc_src_bj_ex;
-	wire halt_ex;
-	wire clk;
+	wire halt_ex, halt_ex_mem, halt_mem_wb;
 	// ram
 	wire [31 : 0] ram_write_data_ex_mem;
 	wire [31 : 0] ram_read_data_mem, ram_read_data_mem_wb;	
-	assign clk = halt_ex == 1'b1 ? 1'b0 : clk_origin;
+	// assign clk = halt_ex == 1'b1 ? 1'b0 : clk_origin;
 	// ID syscall's getting data
-	assign regfile_read_num1_syscall_id = SyscallSrc_id == 1'b1 ? 5'd2 : regfile_read_num1_id;
-	assign regfile_read_num2_syscall_id = SyscallSrc_id == 1'b1 ? 5'd4 : regfile_read_num2_id;
+	// assign regfile_read_num1_syscall_id = SyscallSrc_id == 1'b1 ? 5'd2 : rs_id;
+	// assign regfile_read_num2_syscall_id = SyscallSrc_id == 1'b1 ? 5'd4 : rd_id;
+	always_comb begin
+		if(SyscallSrc_id == 1'b1) begin
+			regfile_read_num1_syscall_id = 5'd2;
+		end
+		else begin 
+			regfile_read_num1_syscall_id = rs_id;
+		end
+	end
+	always_comb begin
+		if(SyscallSrc_id == 1'b1) begin
+			regfile_read_num2_syscall_id = 5'd4;
+		end
+		else begin 
+			regfile_read_num2_syscall_id = rt_id;
+		end
+	end
 	// EX syscall's execution
 	assign halt_ex = SyscallSrc_id_ex == 1'b1 ? (regfile_read_data1_id_ex == 32'd10 ? 1'b1 : 1'b0) : 1'b0;
 	always_ff @(posedge clk) begin 
@@ -200,7 +215,12 @@ module cpu(
 		.read_data1_id_ex   (regfile_read_data1_id_ex),
 		.read_data2_id_ex   (regfile_read_data2_id_ex),
 		.instruction_if_id  (instruction_if_id),
-		.instruction_id_ex  (instruction_id_ex)
+		.instruction_id_ex  (instruction_id_ex),
+		.rt_id              (rt_id),
+		.rd_id              (rd_id),
+		.rt_id_ex           (rt_id_ex),
+		.rd_id_ex           (rd_id_ex),
+		.halt_ex            (halt_ex)
 		);
 
 	// EX
@@ -264,7 +284,9 @@ module cpu(
 		.alu_out_ex_mem          (alu_out_ex_mem),
 		.ram_write_data_ex_mem   (ram_write_data_ex_mem),
 		.rt_ex_mem               (rt_ex_mem),
-		.rd_ex_mem               (rd_ex_mem)
+		.rd_ex_mem               (rd_ex_mem),
+		.halt_ex                 (halt_ex),
+		.halt_ex_mem             (halt_ex_mem)
 		);
   	
 	// MEM
@@ -298,7 +320,9 @@ module cpu(
 		.alu_out_mem_wb      (alu_out_mem_wb),
 		.ram_read_data_mem_wb(ram_read_data_mem_wb),
 		.RegDst_mem_wb       (RegDst_mem_wb),
-		.RegWrite_mem_wb     (RegWrite_mem_wb)
+		.RegWrite_mem_wb     (RegWrite_mem_wb),
+		.halt_ex_mem         (halt_ex_mem),
+		.halt_mem_wb         (halt_mem_wb)
 		);
 
 	jal_src JAL_SRC_MOD(
