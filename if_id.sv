@@ -5,13 +5,24 @@
 
 module if_id(
 	input wire clk,
-	input wire [31 : 0] instruction_if, pc_if,
-	output reg [31 : 0] instruction_if_id = 0, pc_if_id = 0
+	input wire [31 : 0] instruction_if,
+	input wire [31 : 0] pc_if,
+	input wire nop_lock_id,
+	input wire pc_bj,
+	output reg [31 : 0] instruction_if_id = 0,
+	output reg [31 : 0] pc_if_id = 0
     );
 
 	always_ff @(posedge clk) begin
-		instruction_if_id <= instruction_if;
-		pc_if_id <= pc_if;
+		if(nop_lock_id == 1'b0 && pc_bj == 1'b0) begin
+			instruction_if_id <= instruction_if;
+			pc_if_id <= pc_if;
+		end
+		else begin
+			// keep constantly
+			instruction_if_id <= instruction_if_id;
+			pc_if_id <= pc_if;
+		end
 	end
 	
 
