@@ -127,12 +127,12 @@ module cpu(
 
 	// IF
 	pc PC_MOD(
-		.clk  (clk),
 		.rst  (rst),
 		.halt (halt_ex),
-		.in   (pc_src_out_ex),
+		.pc_src_in   (pc_src_out_ex),
 		.out  (pc_if),
 		.pc_bj(pc_src_bj_ex),
+		.pc_if_id   (pc_if_id),
 		.nop_lock_id(nop_lock_id)	
 		);
 	instruction_mem INSTRUCTION_MEM_MOD(
@@ -196,7 +196,8 @@ module cpu(
 		.regfile_write_num_id_ex     (regfile_write_num_id_ex),
 		.Jump_id                     (Jump_id),
 		.regfile_write_num_ex_mem    (regfile_write_num_ex_mem),
-		.nop_lock_id                 (nop_lock_id)
+		.nop_lock_id                 (nop_lock_id),
+		.clk                         (clk)
 		);
 	// ID/EX
 	id_ex ID_EX_MOD(
