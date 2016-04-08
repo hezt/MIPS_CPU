@@ -45,7 +45,7 @@ module pc(
 		else if(halt == 1'b1) out <= out;
 		else if(pc_bj == 1'b1) out <= pc_src_in;
 		else if(nop_lock_id == 1'b1) out <= out;
-		else out <= pc_if_id + 1;;
+		else out <= pc_if_id + 1;
 	end
 endmodule
 

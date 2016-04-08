@@ -20,7 +20,6 @@
 `include "ex_mem.sv"
 `include "mem_wb.sv"
 `include "data_dependence.sv"
-`include "bypass.sv"
 module cpu(
 	input wire clk,
 	output reg [31 : 0] display_syscall,
@@ -63,7 +62,6 @@ module cpu(
 	wire [4 : 0] regfile_read_num1_syscall_id_ex;
 	wire [4 : 0] regfile_read_num2_syscall_id_ex;
 	reg [4 : 0] regfile_write_num_id;
-	wire [4 : 0] regfile_write_num_id_ex, regfile_write_num_ex_mem, regfile_write_num_mem_wb;
 	wire [31 : 0] regfile_write_data_wb;
 	wire [31 : 0] regfile_read_data1_id, regfile_read_data1_id_ex; 
 	wire [31 : 0] regfile_read_data2_id, regfile_read_data2_id_ex;
@@ -83,11 +81,11 @@ module cpu(
 	// ram
 	wire [31 : 0] ram_write_data_ex_mem;
 	wire [31 : 0] ram_read_data_mem, ram_read_data_mem_wb;	
-
+	wire [4 : 0] regfile_write_num_mem_wb, regfile_write_num_ex_mem, regfile_write_num_id_ex;
 	// data denpendence
 	wire nop_lock_id;
 	// bypass
-	wire [2 : 0] bypass_ex;
+	wire [31 : 0] bypass_data1_id, bypass_data2_id;
 	// assign clk = halt_ex == 1'b1 ? 1'b0 : clk_origin;
 	// ID syscall's getting data
 	// assign regfile_read_num1_syscall_id = SyscallSrc_id == 1'b1 ? 5'd2 : rs_id;
@@ -201,7 +199,16 @@ module cpu(
 		.regfile_write_num_ex_mem    (regfile_write_num_ex_mem),
 		.nop_lock_id                 (nop_lock_id),
 		.clk                         (clk),
-		.opcode_id                   (opcode_id)
+		.RegWrite_id_ex              (RegWrite_id_ex),
+		.RegWrite_ex_mem             (RegWrite_ex_mem),
+		.MemRead_id_ex               (MemRead_id_ex),
+		.Jump_id                     (Jump_id),
+		.regfile_read_data1_id       (regfile_read_data1_id),
+		.regfile_read_data2_id       (regfile_read_data2_id),
+		.alu_out_ex                  (alu_out_ex),
+		.ram_read_data_mem           (ram_read_data_mem),
+		.bypass_data1_id             (bypass_data1_id),
+		.bypass_data2_id             (bypass_data2_id)
 		);
 	// ID/EX
 	id_ex ID_EX_MOD(
@@ -220,8 +227,8 @@ module cpu(
 		.MemWrite_id        (MemWrite_id),
 		.MemtoReg_id        (MemtoReg_id),
 		.SyscallSrc_id      (SyscallSrc_id),
-		.read_data1_id      (regfile_read_data1_id),
-		.read_data2_id      (regfile_read_data2_id),
+		.read_data1_id      (bypass_data1_id),
+		.read_data2_id      (bypass_data2_id),
 		.pc_id_ex           (pc_id_ex),
 		.funct_id_ex        (funct_id_ex),
 		.shamt_id_ex        (shamt_id_ex),
@@ -244,24 +251,10 @@ module cpu(
 		.regfile_write_num_id(regfile_write_num_id),
 		.regfile_write_num_id_ex(regfile_write_num_id_ex),
 		.nop_lock_id         (nop_lock_id),
-		.pc_bj               (pc_src_bj_ex),
-		.regfile_read_num1_syscall_id(regfile_read_num1_syscall_id),
-		.regfile_read_num2_syscall_id(regfile_read_num2_syscall_id),
-		.regfile_read_num1_syscall_id_ex(regfile_read_num1_syscall_id_ex),
-		.regfile_read_num2_syscall_id_ex(regfile_read_num2_syscall_id_ex)
+		.pc_bj               (pc_src_bj_ex)
 		);
 
 	// EX
-	bypass BYPASS_MOD(
-		.regfile_write_num_ex_mem       (regfile_write_num_ex_mem),
-		.regfile_write_num_mem_wb       (regfile_write_num_mem_wb),
-		.regfile_read_num1_syscall_id_ex(regfile_read_num1_syscall_id_ex),
-		.regfile_read_num2_syscall_id_ex(regfile_read_num2_syscall_id_ex),
-		.instruction_id_ex              (instruction_id_ex),
-		.Jump_id_ex                     (Jump_id_ex),
-		.bypass_ex                      (bypass_ex),
-		.clk                            (clk)
-		);
 	alu_src ALU_SRC_MOD(
 		.AluSrc            (AluSrc_id_ex),
 		.regfile_read_data1(regfile_read_data1_id_ex),
@@ -269,10 +262,7 @@ module cpu(
 		.ext_immidiate     (ext_immediate_id_ex),
 		.shamt             (shamt_id_ex),
 		.alu_src_out1      (alu_src_out1_ex),
-		.alu_src_out2      (alu_src_out2_ex),
-		.bypass_ex            (bypass_ex),
-		.regfile_write_data_wb(regfile_write_data_wb),
-		.alu_out_ex_mem       (alu_out_ex_mem)
+		.alu_src_out2      (alu_src_out2_ex)
 		);
 
 
