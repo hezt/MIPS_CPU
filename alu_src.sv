@@ -26,6 +26,10 @@ module alu_src(
 				alu_src_out1 = regfile_read_data2;
 				alu_src_out2 = {26'h0, shamt};
 			end
+			default : begin
+				alu_src_out1 = 32'bz;
+				alu_src_out2 = 32'bz;
+			end
 		endcase
 	end
 endmodule

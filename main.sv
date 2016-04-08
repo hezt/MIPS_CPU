@@ -11,14 +11,14 @@ module main(
     input wire clk_board,
     output wire clk_cpu,
     output wire [7 : 0] display_data, display_en,
-    output reg [14 : 0] display_pc
+    output wire [11 : 0] cycles_counter 
     );
     wire clk_led;
     wire [31 : 0] display_syscall;
     cpu cpu(
         .clk            (clk_cpu),
         .display_syscall(display_syscall),
-        .display_pc     (display_pc)
+        .cycles_counter (cycles_counter)
         );
     clock CLOCK_MOD(
         .clk_board(clk_board),

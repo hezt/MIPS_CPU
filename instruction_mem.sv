@@ -12,7 +12,7 @@ module instruction_mem(
 	wire [7 : 0] num;
 	reg [31 : 0] data [255 : 0];
 	initial begin
-		$readmemh("hztdata.txt", data);
+		$readmemh("hztbm.txt", data);
 	end
 	
 	assign num = pc_if[7 : 0];

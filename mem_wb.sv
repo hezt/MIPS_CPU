@@ -22,9 +22,14 @@ module mem_wb(
 	output reg [31 : 0] ram_read_data_mem_wb = 0,
 	output reg RegWrite_mem_wb = 0,
 	output reg halt_mem_wb = 0,
-	output reg [4 : 0] regfile_write_num_mem_wb = 0
+	output reg [4 : 0] regfile_write_num_mem_wb = 0,
+	output reg [11 : 0] cycles_counter = 12'b1
     );
-	
+	// cycles counter
+	always_ff @(posedge clk) begin
+		if(halt_mem_wb == 1'b0) cycles_counter <= cycles_counter + 12'd1;
+	end	
+
 	always_ff @(posedge clk) begin
 		pc_mem_wb <= pc_ex_mem;
 		instruction_mem_wb <= instruction_ex_mem;
