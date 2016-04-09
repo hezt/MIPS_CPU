@@ -12,17 +12,13 @@ module bypass(
     );
    	reg [31 : 0] bypass_data1_ex_temp;
    	reg [31 : 0] bypass_data2_ex_temp; 
-   	reg [31 : 0] bypass_1_counter = 0;
-   	reg [31 : 0] bypass_2_counter = 0;
 	// reg [2 : 0] bypass_ex_temp = 3'b000;
 	always_comb begin
 		if((regfile_read_num1_syscall_id_ex == regfile_write_num_ex_mem) && (regfile_write_num_ex_mem != 0) && (RegWrite_ex_mem == 1'b1)) begin
 			bypass_data1_ex_temp = alu_out_ex_mem;
-			bypass_1_counter = bypass_1_counter + 1;
 		end
 		else if((regfile_read_num1_syscall_id_ex == regfile_write_num_mem_wb) && (regfile_write_num_mem_wb != 0) && (RegWrite_mem_wb == 1'b1)) begin
 			bypass_data1_ex_temp = regfile_write_data_wb;
-			bypass_1_counter = bypass_1_counter + 1;
 		end
 		else bypass_data1_ex_temp = regfile_read_data1_id_ex;
 	end
@@ -30,11 +26,9 @@ module bypass(
 	always_comb begin
 		if((regfile_read_num2_syscall_id_ex == regfile_write_num_ex_mem) && (regfile_write_num_ex_mem != 0) && (RegWrite_ex_mem == 1'b1)) begin
 			bypass_data2_ex_temp = alu_out_ex_mem;
-			bypass_2_counter = bypass_2_counter + 1;
 		end
 		else if((regfile_read_num2_syscall_id_ex == regfile_write_num_mem_wb) && (regfile_write_num_mem_wb != 0) && (RegWrite_mem_wb == 1'b1)) begin
 			bypass_data2_ex_temp = regfile_write_data_wb;
-			bypass_2_counter = bypass_2_counter + 1;
 		end
 		else bypass_data2_ex_temp = regfile_read_data2_id_ex;
 	end

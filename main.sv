@@ -11,8 +11,9 @@ module main(
     input wire clk_board,
     output wire clk_cpu,
     output wire [7 : 0] display_data, display_en,
-    output wire [11 : 0] cycles_counter 
+    output wire [11 : 0] cycles_counter
     );
+    
     wire clk_led;
     wire [31 : 0] display_syscall;
     cpu cpu(

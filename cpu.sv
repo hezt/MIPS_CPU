@@ -113,7 +113,7 @@ module cpu(
 			if(bypass_data1_ex == 32'd10) display_syscall <= display_syscall;
 			else display_syscall <= bypass_data2_ex;
 		end
-		else display_syscall <= bypass_data2_ex;	
+		else display_syscall <= display_syscall;	
   	end
 
   	// judge which is wrote

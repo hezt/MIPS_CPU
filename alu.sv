@@ -10,32 +10,6 @@ module alu(
     output reg [31 : 0] out,
     output reg equal
 	);
-	// wire [31 : 0] add_r; // the add operation's result
-	// wire [31 : 0] sub_r; // the sub operation's result
-	// wire [31 : 0] add_ur; // the without sign data add reuslut
-	// wire [31 : 0] sub_ur; // the without sign data sub reuslut
-	// wire [31 : 0] in1_u; // the in1's data without sign
-	// wire [31 : 0] in2_u; // the in2's data without sign
-	// wire add_cd;
-	// wire sub_cd;
-	// wire add_cf;
-	// wire sub_cf;
-	// wire add_of;
-	// wire sub_of;
-	// wire [1 : 0] add_cfr; // two sign and a cf's result
-	// wire [1 : 0] sub_cfr; // two sign and a cf's result
-	// assign in1_u = {1'b0, in1[30 : 0]};
-	// assign in2_u = {1'b0, in2[30 : 0]};
-	// assign add_ur = in1_u + in2_u;
-	// assign sub_ur = in1_u - in2_u;
-	// assign add_cd = add_ur[31];
-	// assign sub_cd = sub_ur[31];
-	// assign add_cfr = {1'b0, in1[31]} + {1'b0, in2[31]} + {1'b0, add_cd};
-	// assign sub_cfr = {1'b0, in1[31]} - {1'b0, in2[31]} - {1'b0, sub_cd};
-	// assign add_cf = add_cfr[1];
-	// assign sub_cf = sub_cfr[1];
-	// assign add_of = add_cd ^ add_cf;
-	// assign sub_of = sub_cd ^ sub_cf;
     
     always_comb begin
         if(in1 == in2) begin

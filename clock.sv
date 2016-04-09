@@ -12,7 +12,7 @@ module clock(
 	reg [31 : 0] i = 32'd0;
 	always_ff @(posedge clk_board) begin
 		i <= i + 32'd1;
-		if(i == 32'd499999) begin
+		if(i == 32'd2499999) begin
 			i <= 32'd0;
 			clk_cpu <= ~clk_cpu;
 		end

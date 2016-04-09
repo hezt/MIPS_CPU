@@ -17,8 +17,6 @@ module pc_src(
 	wire [2 : 0] op;
 	wire [31 : 0] j, jr, jal;
 	reg [31 : 0] temp_pc;
-	reg [31 : 0] b_success_counter = 0;
-	reg [31 : 0] j_counter = 0;
 	assign op = {Branch, Equal};
 	assign j = {in_pc[31 : 26], in_j};
 	assign jr = in_jr;
@@ -28,17 +26,14 @@ module pc_src(
 			2'b11: begin
 				out = j; // j
 				pc_bj = 1'b1;
-				j_counter = j_counter + 1;
 			end
 			2'b10: begin
 				out = j; // jal
 				pc_bj = 1'b1;
-				j_counter = j_counter + 1;
 			end
 			2'b01: begin 
 				out = jr; // jr
 				pc_bj = 1'b1;
-				j_counter = j_counter + 1;
 			end
 			default: begin 
 				case (op)
@@ -53,7 +48,6 @@ module pc_src(
 					3'b011: begin 
 						out = in_pc + in_branch + 1; // beq equal can branch
 						pc_bj = 1'b1;
-						b_success_counter = b_success_counter + 1;
 					end
 					3'b010: begin 
 						pc_bj = 1'b0; // beq can not branch because of not equal
@@ -62,7 +56,6 @@ module pc_src(
 					3'b100: begin 
 						out = in_pc + in_branch + 1; // bne not equal can branch
 						pc_bj = 1'b1;
-						b_success_counter = b_success_counter + 1;
 					end
 					3'b101: begin 
 						pc_bj = 1'b0; //bne cannot branch because of equal
